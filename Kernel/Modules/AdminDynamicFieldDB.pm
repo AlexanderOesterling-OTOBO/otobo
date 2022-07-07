@@ -197,6 +197,18 @@ sub _AddAction {
     }
 
     my $PossibleValues = $Self->_GetPossibleValues();
+    my $HasSearchfield = 0;
+    POSSIBLEVALUES:
+    for my $Counter ( 1 .. $PossibleValues->{ValueCounter} ) {
+        if ( $PossibleValues->{'Searchfield_' . $Counter} ) {
+            $HasSearchfield = 1;
+            last POSSIBLEVALUES;
+        }
+    }
+
+    if ( !$HasSearchfield ) {
+        $Errors{SearchfieldMandatory} = 'ServerError';
+    }
 
     # Return to add screen if errors.
     if (%Errors) {
@@ -440,6 +452,29 @@ sub _ChangeAction {
     }
 
     my $PossibleValues = $Self->_GetPossibleValues();
+    my $HasSearchfield = 0;
+    my %SearchfieldErrors = ();
+    POSSIBLEVALUES:
+    for my $Counter ( 1 .. $PossibleValues->{ValueCounter} ) {
+        if ( $PossibleValues->{'Searchfield_' . $Counter} ) {
+            $HasSearchfield = 1;
+        }
+        else {
+            $SearchfieldErrors{'Searchfield_' . $Counter . 'ServerError'} = 'ServerError';
+            $SearchfieldErrors{'Searchfield_' . $Counter . 'ServerErrorMessage'} = 'At least one Searchfield is required.';
+        }
+    }
+
+    use Data::Dx;
+    if ( !$HasSearchfield ) {
+        $Errors{SearchfieldServerError} = 'ServerError';
+        Dx %Errors;
+        %Errors = (
+            %Errors,
+            %SearchfieldErrors,
+        );
+        Dx %Errors;
+    }
 
     # Check if dynamic field is present in SysConfig setting.
     my $UpdateEntity        = $ParamObject->GetParam( Param => 'UpdateEntity' ) || '';
@@ -552,6 +587,8 @@ sub _ChangeAction {
 sub _ShowScreen {
     my ( $Self, %Param ) = @_;
 
+    use Data::Dx;
+    Dx %Param;
     $Param{DisplayFieldName} = 'New';
 
     $Param{Name} //= '';
