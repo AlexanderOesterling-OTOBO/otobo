@@ -207,7 +207,7 @@ sub _AddAction {
     }
 
     if ( !$HasSearchfield ) {
-        $Errors{SearchfieldMandatory} = 'ServerError';
+        $Errors{SearchfieldServerError} = 'ServerError';
     }
 
     # Return to add screen if errors.
@@ -458,22 +458,16 @@ sub _ChangeAction {
     for my $Counter ( 1 .. $PossibleValues->{ValueCounter} ) {
         if ( $PossibleValues->{'Searchfield_' . $Counter} ) {
             $HasSearchfield = 1;
-        }
-        else {
-            $SearchfieldErrors{'Searchfield_' . $Counter . 'ServerError'} = 'ServerError';
-            $SearchfieldErrors{'Searchfield_' . $Counter . 'ServerErrorMessage'} = 'At least one Searchfield is required.';
+            last POSSIBLEVALUES;
         }
     }
 
-    use Data::Dx;
     if ( !$HasSearchfield ) {
         $Errors{SearchfieldServerError} = 'ServerError';
-        Dx %Errors;
         %Errors = (
             %Errors,
             %SearchfieldErrors,
         );
-        Dx %Errors;
     }
 
     # Check if dynamic field is present in SysConfig setting.
