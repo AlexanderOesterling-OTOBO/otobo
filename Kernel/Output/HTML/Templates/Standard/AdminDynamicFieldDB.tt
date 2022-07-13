@@ -174,7 +174,6 @@
                 <div class="Content">
                     <fieldset class="TableLike">
 
-                        <div id="SearchfieldServerError" class="TooltipServerError">[% Translate("At least one Searchfield is required.") | html %]</div>
                         <label>[% Translate("Possible values") | html %]:</label>
                         <div class="Field ValueInsert">
                             <input type="hidden" name="ValueCounter" value="[% Data.ValueCounter | html %]" id="ValueCounter" class="ValueCounter" />
@@ -200,8 +199,9 @@
 
 
                                 <label for="Searchfield_[% Data.ValueCounter | html %]" class="CheckboxLabel">
-[% SearchfieldServerError = 'Searchfield_' _ Data.Counter _ 'ServerError' %]
-                                    <input name="Searchfield_[% Data.ValueCounter | html %]" id="Searchfield_[% Data.ValueCounter | html %]" type="checkbox" [% Data.Searchfield | html %]/>
+                                    <input name="Searchfield_[% Data.ValueCounter | html %]" id="Searchfield_[% Data.ValueCounter | html %]" type="checkbox" [% Data.Searchfield | html %] class="[% Data.SearchfieldServerError %] [% Data.ShowWarning %]"/>
+                                    <div id="SearchfieldError" class="TooltipErrorMessage"><p>[% Translate("This field is required.") | html %]</p></div>
+                                    <div id="SearchfieldServerError" class="TooltipErrorMessage"><p>[% Translate("This field is required.") | html %]</p></div>
                                     [% Translate("Searchfield") | html %]
                                 </label>
 
@@ -235,7 +235,9 @@
                                 [% Data.SelectFilter %]
 
                                 <label for="Searchfield[% Data.ValueCounter | html %]" class="CheckboxLabel">
-                                    <input name="Searchfield[% Data.ValueCounter | html %]" id="Searchfield" type="checkbox" [% Data.Searchfield | html %] class="[% Data.SearchfieldServerError %] [% Data.ShowWarning %]" />
+                                    <input name="Searchfield[% Data.ValueCounter | html %]" id="Searchfield" type="checkbox" [% Data.Searchfield | html %]/>
+                                    <div id="SearchfieldError" class="TooltipErrorMessage"><p>[% Translate("At least one Searchfield is required.") | html %]</p></div>
+                                    <div id="SearchfieldServerError" class="TooltipErrorMessage"><p>[% Translate("At least one Searchfield is required.") | html %]</p></div>
                                     [% Translate("Searchfield") | html %]
                                 </label>
 

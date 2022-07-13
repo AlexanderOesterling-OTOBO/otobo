@@ -581,8 +581,6 @@ sub _ChangeAction {
 sub _ShowScreen {
     my ( $Self, %Param ) = @_;
 
-    use Data::Dx;
-    Dx %Param;
     $Param{DisplayFieldName} = 'New';
 
     $Param{Name} //= '';
@@ -855,6 +853,8 @@ sub _ShowScreen {
                 ValueCounter => $ValueCounter,
                 Datatype     => $Param{Datatype},
                 SelectFilter => $Param{SelectFilter},
+                SearchfieldServerError => $Param{SearchfieldServerError},
+                ShowWarning => $Param{ShowWarning},
             },
         );
     }
