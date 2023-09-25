@@ -324,7 +324,7 @@ sub EditFieldRender {
                 my $FieldID = $FieldName . '_' . $ValueIndex;
                 push @SelectionHTML, $Param{LayoutObject}->BuildSelection(
                     Data         => $PossibleValues || {},
-                    Disabled     => $Param{Readonly},
+                    Readonly     => $Param{Readonly},
                     Name         => $FieldName,
                     ID           => $FieldID,
                     SelectedID   => $Value->[$ValueIndex],
@@ -339,7 +339,7 @@ sub EditFieldRender {
             my @SelectedIDs = grep {$_} $Value->@*;
             push @SelectionHTML, $Param{LayoutObject}->BuildSelection(
                 Data         => $PossibleValues || {},
-                Disabled     => $Param{Readonly},
+                Readonly     => $Param{Readonly},
                 Name         => $FieldName,
                 SelectedID   => \@SelectedIDs,
                 Class        => $FieldClass,
@@ -410,7 +410,6 @@ sub EditFieldRender {
 
         my $SelectionHTML = $Param{LayoutObject}->BuildSelection(
             Data        => $PossibleValues || {},
-            Disabled    => $Param{Readonly},
             Name        => $FieldName,
             ID          => $FieldTemplateData{FieldID},
             Class       => $FieldClass,
@@ -480,6 +479,43 @@ sub EditFieldValueGet {
 
     # get the value from the parent class
     my $Value = $Self->SUPER::EditFieldValueGet(%Param);
+    my $FieldName = 'DynamicField_' . $Param{DynamicFieldConfig}->{Name};
+
+    my $Value;
+
+    # check if there is a Template and retrieve the dynamic field value from there
+    if ( IsHashRefWithData( $Param{Template} ) && defined $Param{Template}->{$FieldName} ) {
+        $Value = $Param{Template}->{$FieldName};
+    }
+
+    # otherwise get dynamic field value from the web request
+    elsif (
+        defined $Param{ParamObject}
+        && ref $Param{ParamObject} eq 'Kernel::System::Web::Request'
+        )
+    {
+        if ( $Param{DynamicFieldConfig}->{Config}{MultiValue} ) {
+            my @DataAll = $Param{ParamObject}->GetArray( Param => $FieldName );
+
+            # delete the template value
+            if ( !$Param{DynamicFieldConfig}->{Readonly} ) {
+                pop @DataAll;
+            }
+
+            # delete empty values (can happen if the user has selected the "-" entry)
+            $Value = [ map { $_ // '' } @DataAll ];
+        }
+        else {
+            $Value = $Param{ParamObject}->GetParam( Param => $FieldName );
+        }
+    }
+
+    if ( defined $Param{ReturnTemplateStructure} && $Param{ReturnTemplateStructure} eq '1' ) {
+        return {
+            $FieldName => $Value,
+        };
+    }
+>>>>>>> e480c1fbd (Issue #2251: Adjusted dynamic field drivers to pass on readonly attribute.)
 
     # for this field the normal return an the ReturnValueStructure are the same
     return $Value unless $Param{ForLens};
